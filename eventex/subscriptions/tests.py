@@ -34,7 +34,7 @@ class SubscribeTest(TestCase):
 class SubscribePostTest(TestCase):
     def setUp(self):
         data = dict(name='Jose Victor', cpf='12345678901',
-                    email='jose@victor.com', phone='43-3358-6180')
+                    email='jose@mailinator.com', phone='43-3358-6180')
         self.response = self.client.post('/inscricao/', data)
         self.email = mail.outbox[0]
 
@@ -56,7 +56,7 @@ class SubscribePostTest(TestCase):
         self.assertEqual(expect, self.email.from_email)
 
     def test_subscription_email_to(self):
-        expect = ['tinhodunk@gmail.com', 'jose@victor.com']
+        expect = ['tinhodunk@gmail.com', 'jose@mailinator.com']
 
         self.assertEqual(expect, self.email.to)
 
@@ -64,7 +64,7 @@ class SubscribePostTest(TestCase):
 
         self.assertIn('Jose Victor', self.email.body)
         self.assertIn('12345678901', self.email.body)
-        self.assertIn('jose@victor.com', self.email.body)
+        self.assertIn('jose@mailinator.com', self.email.body)
         self.assertIn('43-3358-6180', self.email.body)
 
 class SubscribeInvalidPost(TestCase):
@@ -84,3 +84,13 @@ class SubscribeInvalidPost(TestCase):
 
     def test_form_has_errors(self):
         self.assertTrue(self.form.errors)
+
+class SubscribeSuccessMessage(TestCase):
+    def setUp(self):
+        self.data = dict(name='Jose Victor', cpf='12345678901',
+                         email='jose@mailinator.com', phone='43-3358-5544')
+        self.response = self.client.post('/inscricao/', self.data, follow=True)
+
+    def test_message(self):
+        self.assertContains(self.response, 'Inscricao realizada com sucesso!')
+
